@@ -1,18 +1,42 @@
 package service
 
-import "github.com/artfunder/structs"
+import (
+	"github.com/artfunder/structs"
+	"github.com/artfunder/users-service/repository"
+)
+
+// NewUsersService ...
+func NewUsersService(repo repository.UsersRepository) *UsersService {
+	service := new(UsersService)
+	service.repo = repo
+	return service
+}
 
 // UsersService ...
-type UsersService struct{}
+type UsersService struct {
+	repo repository.UsersRepository
+}
 
 // GetAll ...
-func (UsersService) GetAll() ([]structs.User, error) {
-	return []structs.User{}, nil
+func (service UsersService) GetAll() ([]structs.User, error) {
+	users, err := service.repo.GetAll()
+	if err != nil {
+		return []structs.User{}, err
+	}
+	for i := range users {
+		users[i].Password = ""
+	}
+	return users, nil
 }
 
 // GetOne ...
-func (UsersService) GetOne(id int) (structs.User, error) {
-	return structs.User{}, nil
+func (service UsersService) GetOne(id int) (structs.User, error) {
+	user, err := service.repo.GetOne(id)
+	if err != nil {
+		return structs.User{}, err
+	}
+	user.Password = ""
+	return user, nil
 }
 
 // Create ...
