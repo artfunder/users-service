@@ -8,7 +8,9 @@ import (
 )
 
 // MockRepo ...
-type MockRepo struct{}
+type MockRepo struct {
+	nextID int
+}
 
 // GetAll ...
 func (MockRepo) GetAll() ([]structs.User, error) {
@@ -23,6 +25,18 @@ func (MockRepo) GetOne(id int) (structs.User, error) {
 	return SampleUsers[id-1], nil
 }
 
+// Create ...
+func (r MockRepo) Create(user structs.User) (structs.User, error) {
+	user.ID = r.nextID
+	return user, nil
+}
+
+// SetNextID ...
+func (r *MockRepo) SetNextID(id int) *MockRepo {
+	r.nextID = id
+	return r
+}
+
 // BadRepo ...
 type BadRepo struct{}
 
@@ -34,6 +48,11 @@ func (BadRepo) GetAll() ([]structs.User, error) {
 // GetOne ...
 func (BadRepo) GetOne(id int) (structs.User, error) {
 	return SampleUsers[2], ErrBad
+}
+
+// Create ...
+func (BadRepo) Create(user structs.User) (structs.User, error) {
+	return structs.User{}, ErrBad
 }
 
 // ErrBad ...

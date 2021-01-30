@@ -40,8 +40,12 @@ func (service UsersService) GetOne(id int) (structs.User, error) {
 }
 
 // Create ...
-func (UsersService) Create(userInfo structs.User) (structs.User, error) {
-	return structs.User{}, nil
+func (service UsersService) Create(userInfo structs.User) (structs.User, error) {
+	user, err := service.repo.Create(userInfo)
+
+	user.Password = ""
+
+	return user, err
 }
 
 // Update ...
