@@ -23,9 +23,7 @@ func (service UsersService) GetAll() ([]structs.User, error) {
 	if err != nil {
 		return []structs.User{}, err
 	}
-	for i := range users {
-		users[i].Password = ""
-	}
+	removePasswords(users)
 	return users, nil
 }
 
@@ -35,21 +33,22 @@ func (service UsersService) GetOne(id int) (structs.User, error) {
 	if err != nil {
 		return structs.User{}, err
 	}
-	user.Password = ""
-	return user, nil
+	return withoutPassword(user), nil
 }
 
 // Create ...
 func (service UsersService) Create(userInfo structs.User) (structs.User, error) {
-	if userInfo.Username == "" {
-		return structs.User{}, ErrMustHaveUsername
+	err := checkUserHasRequiredFields(userInfo)
+	if err != nil {
+		return structs.User{}, err
 	}
 
 	user, err := service.repo.Create(userInfo)
+	if err != nil {
+		return structs.User{}, err
+	}
 
-	user.Password = ""
-
-	return user, err
+	return withoutPassword(user), nil
 }
 
 // Update ...

@@ -103,6 +103,30 @@ var createTests = []CreateTest{
 		expectedErr:  service.ErrMustHaveUsername,
 		expectedUser: structs.User{},
 	},
+	{
+		name: "Fails without Email",
+		repo: new(test.MockRepo).SetNextID(4),
+		inputUser: structs.User{
+			Firstname: "John",
+			Lastname:  "Doe",
+			Username:  "john_doe",
+			Password:  "1234",
+		},
+		expectedErr:  service.ErrMustHaveEmail,
+		expectedUser: structs.User{},
+	},
+	{
+		name: "Fails without Password",
+		repo: new(test.MockRepo).SetNextID(4),
+		inputUser: structs.User{
+			Firstname: "John",
+			Lastname:  "Doe",
+			Username:  "john_doe",
+			Email:     "john_doe@example.com",
+		},
+		expectedErr:  service.ErrInvalidPassword,
+		expectedUser: structs.User{},
+	},
 }
 
 func TestCreate(t *testing.T) {
