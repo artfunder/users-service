@@ -41,6 +41,10 @@ func (service UsersService) GetOne(id int) (structs.User, error) {
 
 // Create ...
 func (service UsersService) Create(userInfo structs.User) (structs.User, error) {
+	if userInfo.Username == "" {
+		return structs.User{}, ErrMustHaveUsername
+	}
+
 	user, err := service.repo.Create(userInfo)
 
 	user.Password = ""
