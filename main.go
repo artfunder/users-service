@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	r := router.CreateRouter(service.NewUsersService(new(repository.SQLiteRepo)))
+	r := router.CreateRouter(service.NewUsersService(repository.NewSQLiteRepo()))
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }

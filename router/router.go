@@ -1,8 +1,11 @@
 package router
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"strconv"
 
+	"github.com/artfunder/structs"
 	"github.com/artfunder/users-service/repository"
 	"github.com/artfunder/users-service/service"
 	"github.com/gin-gonic/gin"
@@ -13,6 +16,7 @@ func CreateRouter(s *service.UsersService) *gin.Engine {
 	r := gin.Default()
 
 	r.GET("/:id", getOneHandler(s))
+	r.POST("/", createHandler(s))
 
 	return r
 }
@@ -39,6 +43,42 @@ func getOneHandler(s *service.UsersService) gin.HandlerFunc {
 		}
 
 		c.JSON(200, gin.H{
+			"success": true,
+			"user":    user,
+		})
+	}
+}
+
+func createHandler(s *service.UsersService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var userInfo structs.User
+		body, err := ioutil.ReadAll(c.Request.Body)
+		if err != nil {
+			c.JSON(400, gin.H{
+				"success": false,
+				"error":   "Bad Request",
+			})
+			return
+		}
+		err = json.Unmarshal(body, &userInfo)
+		if err != nil {
+			c.JSON(400, gin.H{
+				"success": false,
+				"error":   "Bad JSON",
+			})
+			return
+		}
+
+		user, err := s.Create(userInfo)
+		if err != nil {
+			c.JSON(400, gin.H{
+				"success": false,
+				"error":   err.Error(),
+			})
+			return
+		}
+
+		c.JSON(201, gin.H{
 			"success": true,
 			"user":    user,
 		})
