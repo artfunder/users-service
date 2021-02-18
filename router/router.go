@@ -3,6 +3,8 @@ package router
 import (
 	"encoding/json"
 	"io/ioutil"
+	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/artfunder/structs"
@@ -12,13 +14,15 @@ import (
 )
 
 // CreateRouter ...
-func CreateRouter(s *service.UsersService) *gin.Engine {
-	r := gin.Default()
+func CreateRouter(s *service.UsersService) http.Handler {
+	// r := gin.Default()
 
-	r.GET("/:id", getOneHandler(s))
-	r.POST("/", createHandler(s))
+	// r.GET("/:id", getOneHandler(s))
+	// r.POST("/", createHandler(s))
 
-	return r
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", os.Getenv("CLIENT_SITE"))
+	})
 }
 
 func getOneHandler(s *service.UsersService) gin.HandlerFunc {
